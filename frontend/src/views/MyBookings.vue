@@ -47,6 +47,7 @@
           <div class="booking-price">
             <div class="price">¥{{ booking.totalPrice }}</div>
             <div class="actions">
+              <el-button v-if="booking.status === 0" type="warning" text @click="goToPay(booking.id)">去支付</el-button>
               <el-button v-if="booking.status === 0" type="primary" text @click="showDetail(booking)">查看详情</el-button>
               <el-button v-if="booking.status < 2" type="danger" text @click="handleCancel(booking.id)">取消订单</el-button>
               <el-button v-if="booking.status === 3" type="primary" text @click="$router.push('/booking')">再次预订</el-button>
@@ -95,10 +96,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Calendar, User, ChatDotRound } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { bookingApi } from '../api'
+
+const router = useRouter()
 
 const bookings = ref([])
 const loading = ref(false)
@@ -108,8 +112,12 @@ const activeTab = ref('all')
 const detailVisible = ref(false)
 const currentBooking = ref(null)
 
-const statusText = ['待确认', '已确认', '已入住', '已完成', '已取消']
+const statusText = ['待支付', '已支付', '已入住', '已完成', '已取消']
 const statusType = ['warning', 'primary', 'success', 'info', 'danger']
+
+const goToPay = (bookingId) => {
+  router.push({ path: '/payment', query: { bookingId } })
+}
 
 const getRoomImage = (roomId) => {
   const images = [

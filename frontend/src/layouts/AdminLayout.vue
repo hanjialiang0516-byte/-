@@ -19,9 +19,9 @@
           <el-icon><User /></el-icon>
           <span>客户档案</span>
         </el-menu-item>
-        <el-menu-item index="/admin/phone-booking">
-          <el-icon><Phone /></el-icon>
-          <span>电话预订</span>
+        <el-menu-item index="/admin/finance">
+          <el-icon><Money /></el-icon>
+          <span>经营统计</span>
         </el-menu-item>
         <el-menu-item index="/admin/reports">
           <el-icon><DataAnalysis /></el-icon>
@@ -48,7 +48,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { DataAnalysis, List, House, User, Phone, Back } from '@element-plus/icons-vue'
+import { DataAnalysis, List, House, User, Money, Back } from '@element-plus/icons-vue'
 import { useUserStore } from '../store/user'
 
 const router = useRouter()

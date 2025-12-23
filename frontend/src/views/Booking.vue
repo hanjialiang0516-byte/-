@@ -229,16 +229,29 @@ const submitBooking = async () => {
   await formRef.value.validate()
   submitting.value = true
   try {
-    await bookingApi.create({
+    const res = await bookingApi.create({
       roomId: selectedRoom.value.id,
       checkInDate: checkIn.value,
       checkOutDate: checkOut.value,
       totalPrice: totalPrice.value,
       ...bookingForm
     })
-    ElMessage.success('预订成功！请在"我的预订"中查看订单')
+    ElMessage.success('订单创建成功，请完成支付')
     dialogVisible.value = false
-    router.push('/my-bookings')
+    // 跳转到支付页面，带上订单信息
+    router.push({ 
+      path: '/payment', 
+      query: { 
+        bookingId: res.data.id,
+        orderNo: res.data.orderNo,
+        roomNumber: selectedRoom.value.roomNumber,
+        checkIn: checkIn.value,
+        checkOut: checkOut.value,
+        guestName: bookingForm.guestName,
+        guestPhone: bookingForm.guestPhone,
+        price: totalPrice.value
+      } 
+    })
   } finally {
     submitting.value = false
   }

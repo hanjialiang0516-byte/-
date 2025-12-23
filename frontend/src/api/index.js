@@ -51,7 +51,9 @@ export const roomTypeApi = {
 export const bookingApi = {
   create: (data) => api.post('/bookings', data),
   getMyBookings: (page = 1, size = 10) => api.get('/bookings', { params: { page, size } }),
-  cancel: (id) => api.post(`/bookings/${id}/cancel`)
+  getDetail: (id) => api.get(`/bookings/${id}`),
+  cancel: (id) => api.post(`/bookings/${id}/cancel`),
+  pay: (id) => api.post(`/bookings/${id}/pay`)
 }
 
 export const messageApi = {

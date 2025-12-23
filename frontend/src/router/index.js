@@ -12,6 +12,7 @@ const routes = [
       { path: 'rooms', name: 'Rooms', component: () => import('../views/RoomList.vue') },
       { path: 'booking', name: 'Booking', component: () => import('../views/Booking.vue'), meta: { auth: true } },
       { path: 'my-bookings', name: 'MyBookings', component: () => import('../views/MyBookings.vue'), meta: { auth: true } },
+      { path: 'payment', name: 'Payment', component: () => import('../views/Payment.vue'), meta: { auth: true } },
       { path: 'profile', name: 'Profile', component: () => import('../views/Profile.vue'), meta: { auth: true } },
       { path: 'messages', name: 'Messages', component: () => import('../views/Messages.vue'), meta: { auth: true } }
     ]
@@ -25,7 +26,7 @@ const routes = [
       { path: 'rooms', name: 'AdminRooms', component: () => import('../views/admin/Rooms.vue') },
       { path: 'bookings', name: 'AdminBookings', component: () => import('../views/admin/Bookings.vue') },
       { path: 'users', name: 'AdminUsers', component: () => import('../views/admin/Users.vue') },
-      { path: 'phone-booking', name: 'PhoneBooking', component: () => import('../views/admin/PhoneBooking.vue') },
+      { path: 'finance', name: 'AdminFinance', component: () => import('../views/admin/Finance.vue') },
       { path: 'reports', name: 'AdminReports', component: () => import('../views/admin/Reports.vue') }
     ]
   }

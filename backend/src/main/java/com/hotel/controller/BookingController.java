@@ -30,9 +30,20 @@ public class BookingController {
         return Result.success(bookingService.getUserBookings((Long) auth.getPrincipal(), page, size));
     }
     
+    @GetMapping("/{id}")
+    public Result<Booking> getBookingDetail(@PathVariable Long id) {
+        return Result.success(bookingService.getBookingDetail(id));
+    }
+    
     @PostMapping("/{id}/cancel")
     public Result<Void> cancelBooking(@PathVariable Long id) {
         bookingService.cancelBooking(id);
+        return Result.success();
+    }
+    
+    @PostMapping("/{id}/pay")
+    public Result<Void> payBooking(@PathVariable Long id) {
+        bookingService.payBooking(id);
         return Result.success();
     }
 }

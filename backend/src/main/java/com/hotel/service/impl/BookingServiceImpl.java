@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.entity.Booking;
+import com.hotel.entity.Room;
 import com.hotel.mapper.BookingMapper;
 import com.hotel.service.BookingService;
 import com.hotel.service.MessageService;
@@ -25,14 +26,34 @@ public class BookingServiceImpl extends ServiceImpl<BookingMapper, Booking> impl
     @Transactional
     public Booking createBooking(Booking booking) {
         booking.setOrderNo(IdUtil.getSnowflakeNextIdStr());
-        booking.setStatus(0);
+        booking.setStatus(0); // 待支付
         save(booking);
         roomService.updateRoomStatus(booking.getRoomId(), 1);
-        if (booking.getUserId() != null) {
-            messageService.sendMessage(booking.getUserId(), "预订成功", 
-                "您的订单 " + booking.getOrderNo() + " 已提交，等待确认", 1);
+        return booking;
+    }
+    
+    @Override
+    public Booking getBookingDetail(Long bookingId) {
+        Booking booking = getById(bookingId);
+        if (booking != null) {
+            Room room = roomService.getById(booking.getRoomId());
+            booking.setRoom(room);
         }
         return booking;
+    }
+    
+    @Override
+    @Transactional
+    public void payBooking(Long bookingId) {
+        Booking booking = getById(bookingId);
+        if (booking != null && booking.getStatus() == 0) {
+            booking.setStatus(1); // 已支付/已确认
+            updateById(booking);
+            if (booking.getUserId() != null) {
+                messageService.sendMessage(booking.getUserId(), "支付成功", 
+                    "您的订单 " + booking.getOrderNo() + " 已支付成功，请于入住日期14:00后办理入住", 1);
+            }
+        }
     }
     
     @Override
