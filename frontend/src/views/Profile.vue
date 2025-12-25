@@ -52,8 +52,24 @@
             <el-form-item label="邮箱">
               <el-input v-model="form.email" placeholder="请输入邮箱" />
             </el-form-item>
-            <el-form-item label="头像链接">
-              <el-input v-model="form.avatar" placeholder="请输入头像图片URL" />
+            <el-form-item label="上传头像">
+              <div class="avatar-upload">
+                <el-upload
+                  class="avatar-uploader"
+                  :show-file-list="false"
+                  :before-upload="beforeAvatarUpload"
+                  :http-request="handleAvatarUpload"
+                  accept="image/*"
+                  :disabled="!editing"
+                >
+                  <el-avatar v-if="form.avatar" :size="80" :src="form.avatar" />
+                  <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                </el-upload>
+                <div class="upload-tip">
+                  <span v-if="!editing" style="color: #E6A23C;">请先点击右上角"编辑"按钮</span>
+                  <span v-else>点击上传头像，支持 JPG/PNG 格式，大小不超过 2MB</span>
+                </div>
+              </div>
             </el-form-item>
             <el-form-item v-if="editing">
               <el-button type="primary" @click="handleSave" :loading="loading">保存修改</el-button>
@@ -86,6 +102,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import { userApi, bookingApi } from '../api'
 import { useUserStore } from '../store/user'
 
@@ -97,6 +114,66 @@ const passwordForm = reactive({ oldPassword: '', newPassword: '', confirmPasswor
 const stats = reactive({ totalBookings: 0, completedBookings: 0, totalSpent: 0 })
 
 const avatarUrl = computed(() => form.avatar || '')
+
+// 头像上传前校验
+const beforeAvatarUpload = (file) => {
+  const isImage = file.type.startsWith('image/')
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件！')
+    return false
+  }
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB！')
+    return false
+  }
+  return true
+}
+
+// 压缩图片
+const compressImage = (file, maxWidth = 60, quality = 0.5) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        let width = img.width
+        let height = img.height
+        
+        // 按比例缩放
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height
+          width = maxWidth
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        
+        // 转为压缩后的base64
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality)
+        resolve(compressedBase64)
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+// 处理头像上传（压缩后转为base64）
+const handleAvatarUpload = async (options) => {
+  const file = options.file
+  try {
+    const compressedBase64 = await compressImage(file, 100, 0.7)
+    form.avatar = compressedBase64
+    ElMessage.success('头像上传成功')
+  } catch (err) {
+    ElMessage.error('头像上传失败')
+  }
+}
 
 onMounted(async () => {
   // 获取用户信息
@@ -165,5 +242,39 @@ const handleChangePassword = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s;
+}
+
+.avatar-uploader:hover {
+  border-color: #409EFF;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+}
+
+.upload-tip {
+  color: #999;
+  font-size: 12px;
+  line-height: 1.5;
 }
 </style>

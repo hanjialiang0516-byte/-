@@ -10,7 +10,7 @@ CREATE TABLE sys_user (
     real_name VARCHAR(50) COMMENT '真实姓名',
     phone VARCHAR(20) COMMENT '手机号',
     email VARCHAR(100) COMMENT '邮箱',
-    avatar VARCHAR(255) COMMENT '头像',
+    avatar MEDIUMTEXT COMMENT '头像(base64)',
     role TINYINT DEFAULT 0 COMMENT '角色：0-普通用户 1-管理员',
     status TINYINT DEFAULT 1 COMMENT '状态：0-禁用 1-启用',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,

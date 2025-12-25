@@ -49,16 +49,7 @@
           </el-form-item>
         </el-form>
         
-        <el-divider>或</el-divider>
-        
-        <div class="social-login">
-          <el-button size="large" style="flex: 1">
-            <el-icon><ChatDotRound /></el-icon> 微信登录
-          </el-button>
-          <el-button size="large" style="flex: 1">
-            <el-icon><Phone /></el-icon> 手机登录
-          </el-button>
-        </div>
+        <el-divider />
         
         <div class="register-link">
           还没有账号？<router-link to="/register">立即注册</router-link>
@@ -72,7 +63,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Check, ChatDotRound, Phone } from '@element-plus/icons-vue'
+import { Check } from '@element-plus/icons-vue'
 import { authApi } from '../api'
 import { useUserStore } from '../store/user'
 
@@ -145,12 +136,6 @@ const handleLogin = async () => {
   display: flex;
   justify-content: space-between;
   width: 100%;
-}
-
-.social-login {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
 }
 
 .register-link {
