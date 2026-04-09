@@ -16,7 +16,16 @@ api.interceptors.request.use(config => {
 })
 
 api.interceptors.response.use(
-  response => {
+  async response => {
+    if (response.config.responseType === 'blob') {
+      if (response.data.type && response.data.type.includes('application/json')) {
+        const text = await response.data.text()
+        const data = JSON.parse(text)
+        ElMessage.error(data.message || '导出失败')
+        return Promise.reject(data)
+      }
+      return response
+    }
     if (response.data.code !== 200) {
       ElMessage.error(response.data.message)
       return Promise.reject(response.data)
@@ -84,7 +93,9 @@ export const adminApi = {
   updateRoomType: (id, data) => api.put(`/admin/rooms/types/${id}`, data),
   deleteRoomType: (id) => api.delete(`/admin/rooms/types/${id}`),
   getUsers: (page, size) => api.get('/admin/users', { params: { page, size } }),
-  updateUserStatus: (id, status) => api.put(`/admin/users/${id}/status`, { status })
+  updateUserStatus: (id, status) => api.put(`/admin/users/${id}/status`, { status }),
+  getReportList: (params) => api.get('/admin/reports/export', { params: { ...params, isExport: false } }),
+  exportReport: (params) => api.get('/admin/reports/export', { params: { ...params, isExport: true }, responseType: 'blob' })
 }
 
 export default api

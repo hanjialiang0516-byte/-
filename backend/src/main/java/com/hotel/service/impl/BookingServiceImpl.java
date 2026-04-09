@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl extends ServiceImpl<BookingMapper, Booking> implements BookingService {
@@ -48,6 +50,7 @@ public class BookingServiceImpl extends ServiceImpl<BookingMapper, Booking> impl
         Booking booking = getById(bookingId);
         if (booking != null && booking.getStatus() == 0) {
             booking.setStatus(1); // 已支付/已确认
+            booking.setPayTime(LocalDateTime.now()); // 👈 记录支付时间
             updateById(booking);
             if (booking.getUserId() != null) {
                 messageService.sendMessage(booking.getUserId(), "支付成功", 
