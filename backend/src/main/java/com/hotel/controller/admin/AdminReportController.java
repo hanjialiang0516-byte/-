@@ -66,11 +66,13 @@ public class AdminReportController {
     }
 
     /**
-     * 导出经营统计数据为 Excel
+     * 导出或查询经营统计数据
      */
     @GetMapping("/export")
-    public void exportReport(@ModelAttribute ReportQueryDTO queryDTO, HttpServletResponse response) throws IOException {
-        log.info("导出经营统计数据：{}", queryDTO);
+    public Object exportReport(@ModelAttribute ReportQueryDTO queryDTO, 
+                               @RequestParam(required = false, defaultValue = "true") Boolean isExport,
+                               HttpServletResponse response) throws IOException {
+        log.info("导出/查询经营统计数据：{}", queryDTO);
         // 1. 设置默认时间范围（最近30天）
         if (queryDTO.getStartDate() == null) {
             queryDTO.setStartDate(LocalDate.now().minusDays(30));
@@ -81,6 +83,11 @@ public class AdminReportController {
 
         // 2. 查询数据（传入 DTO）
         List<ReportExportVO> voList = AdminReportService.getReportDataForExport(queryDTO);
+        
+        if (isExport != null && !isExport) {
+            return Result.success(voList);
+        }
+        
         log.info("查询数据：{}条", voList.size());
 
         // 3. 设置响应头
@@ -97,5 +104,7 @@ public class AdminReportController {
         EasyExcel.write(response.getOutputStream(), ReportExportVO.class)
                 .sheet("经营统计")
                 .doWrite(voList);
+                
+        return null;
     }
 }
